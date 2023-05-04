@@ -21,10 +21,13 @@ services:
     environment:
       <<: *x-postgres-environment
       SECRET_KEY: ${SECRET_KEY}
+      SWAGGER_JSON: "/application/schema.yml"
     volumes:
       - "./backend/app:/application/"
     ports:
       - "5006:8000"
+
+  swagger:
 
 volumes:
   pgdata:

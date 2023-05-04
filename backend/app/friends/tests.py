@@ -45,7 +45,7 @@ class FriendsTest(APITestCase):
 
     def delete_friend(self, header: dict, to: str):
         response = self.client.delete(f"http://127.0.0.1:5006/friends/{to}/remove/", headers=header)
-        self.assertTrue(response.json()["status"] == "ok")
+        self.assertTrue(response.status_code == 204)
 
     def get_status(self, header: dict, to: str, need_status: str):
         request = self.client.get(f"http://127.0.0.1:5006/friends/request/{to}/status", headers=header)

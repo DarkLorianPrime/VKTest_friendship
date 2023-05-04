@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -38,9 +38,14 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'authserver',
-    'friends'
+    'friends',
+    'drf_spectacular'
 ]
-
+SPECTACULAR_SETTINGS = {
+    "TITLE": "VKtest_friendship",
+    "VERSION": "2.1.1",
+    "DESCRIPTION": "Project for VK intership about friend and rainbow.",
+}
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -73,7 +78,8 @@ WSGI_APPLICATION = 'core.wsgi.application'
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         'rest_framework.authentication.TokenAuthentication'
-    ]
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

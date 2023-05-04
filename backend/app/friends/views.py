@@ -1,28 +1,33 @@
+from typing import List, Dict
+
 import datetime
 import pytz
 
 from django.db.models import F, Q
 from django.utils import timezone
+from drf_spectacular.utils import extend_schema
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 from rest_framework.status import HTTP_201_CREATED, HTTP_404_NOT_FOUND, HTTP_400_BAD_REQUEST
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ViewSet, ModelViewSet
 
 from authserver.models import User
 from friends.models import FriendRequest
 
 
-class Friendship(ModelViewSet):
+class Friendship(ViewSet):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema()
     def update_fields(self, instance, fields: dict):
         for key, value in fields.items():
             setattr(instance, key, value)
         instance.save()
 
+    @extend_schema()
     def get_status(self, request: Request, username: str):
         user = get_object_or_404(User, ~Q(id=request.user.id), username=username)
 
@@ -37,6 +42,7 @@ class Friendship(ModelViewSet):
 
         return Response({"status": "nothing"})
 
+    @extend_schema()
     def send_request(self, request: Request, username: str):
         user = get_object_or_404(User, ~Q(id=request.user.id), username=username)
         query = {}
@@ -57,6 +63,7 @@ class Friendship(ModelViewSet):
         FriendRequest.objects.create(from_request=user, to_request=request.user, **query)
         return Response({"status": "ok"}, status=HTTP_201_CREATED)
 
+    @extend_schema()
     def get_all_requests(self, request: Request):
         is_incoming: bool = request.query_params.get("incoming", "false").lower() == "true"
 
@@ -68,6 +75,7 @@ class Friendship(ModelViewSet):
                         .annotate(username=F("from_request__username"))
                         .values("id", "username", "is_accepted"))
 
+    @extend_schema()
     def answer_request(self, request: Request, request_id: str):
         is_accept: bool = request.query_params.get("action", "accept").lower() == "accept"  # accept=true - cancel=false
         query = {"is_accepted": is_accept, "answered_on": datetime.datetime.now(tz=timezone.utc)}
@@ -84,11 +92,15 @@ class Friendship(ModelViewSet):
 
         return Response({"status": "ok"})
 
+    @extend_schema(
+        responses={200: List[Dict[str, str]]}
+    )
     def get_friends(self, request: Request):
         return Response(request.user.friends.values("id", "username"))
 
+    @extend_schema()
     def remove_friend(self, request: Request, username):
         user = get_object_or_404(User, ~Q(id=request.user.id), username=username)
 
         request.user.friends.remove(user)
-        return Response({"status": "ok"})
+        return Response(status=204)
