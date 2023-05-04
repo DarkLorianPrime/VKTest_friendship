@@ -1,0 +1,30 @@
+version: "3.8"
+
+x-postgres-environment: &x-postgres-environment
+  POSTGRES_USER: ${PG_USER}
+  POSTGRES_PASSWORD: ${PG_PASSWORD}
+  POSTGRES_HOST: ${PG_HOST}
+  POSTGRES_NAME: ${PG_NAME}
+
+services:
+  database:
+    restart: always
+    image: postgres:alpine
+    volumes:
+      - "pgdata:/var/lib/postgresql/data"
+    environment:
+      <<: *x-postgres-environment
+
+  backend:
+    restart: always
+    build: backend
+    environment:
+      <<: *x-postgres-environment
+      SECRET_KEY: ${SECRET_KEY}
+    volumes:
+      - "./backend/app:/application/"
+    ports:
+      - "5006:8000"
+
+volumes:
+  pgdata:
