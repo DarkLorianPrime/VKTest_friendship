@@ -67,7 +67,7 @@ HTTP/1.1 201 Created
     "status": "ok"
 }
 ```
-Больше примеров описано в /backend/app/friends/tests.py
+Больше примеров описано в `/backend/app/friends/tests.py`
 # Install
 ### Предполагается, что docker, compose, nginx и их зависимости уже установлены
 - Создаем директорию для проекта
