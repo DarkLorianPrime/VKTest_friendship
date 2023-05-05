@@ -27,7 +27,5 @@ services:
     ports:
       - "5006:8000"
 
-  swagger:
-
 volumes:
   pgdata:

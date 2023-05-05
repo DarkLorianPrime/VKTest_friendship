@@ -23,7 +23,6 @@ urlpatterns = [
     path('', include("authserver.urls")),
     path('friends/', include("friends.urls")),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    # Optional UI:
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
 
 ]

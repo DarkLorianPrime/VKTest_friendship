@@ -1,0 +1,418 @@
+openapi: 3.0.3
+info:
+  title: VKtest_friendship
+  version: 2.1.1
+  description: Project for VK intership about friend and rainbow.
+paths:
+  /api/schema/:
+    get:
+      operationId: api_schema_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - af
+          - ar
+          - ar-dz
+          - ast
+          - az
+          - be
+          - bg
+          - bn
+          - br
+          - bs
+          - ca
+          - ckb
+          - cs
+          - cy
+          - da
+          - de
+          - dsb
+          - el
+          - en
+          - en-au
+          - en-gb
+          - eo
+          - es
+          - es-ar
+          - es-co
+          - es-mx
+          - es-ni
+          - es-ve
+          - et
+          - eu
+          - fa
+          - fi
+          - fr
+          - fy
+          - ga
+          - gd
+          - gl
+          - he
+          - hi
+          - hr
+          - hsb
+          - hu
+          - hy
+          - ia
+          - id
+          - ig
+          - io
+          - is
+          - it
+          - ja
+          - ka
+          - kab
+          - kk
+          - km
+          - kn
+          - ko
+          - ky
+          - lb
+          - lt
+          - lv
+          - mk
+          - ml
+          - mn
+          - mr
+          - ms
+          - my
+          - nb
+          - ne
+          - nl
+          - nn
+          - os
+          - pa
+          - pl
+          - pt
+          - pt-br
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sr-latn
+          - sv
+          - sw
+          - ta
+          - te
+          - tg
+          - th
+          - tk
+          - tr
+          - tt
+          - udm
+          - uk
+          - ur
+          - uz
+          - vi
+          - zh-hans
+          - zh-hant
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /friends/:
+    get:
+      operationId: friends_retrieve
+      description: Возвращает всех друзей по переданному токену
+      parameters:
+      - in: header
+        name: Authorization
+        schema:
+          type: string
+        description: 'Требуется для определения пользователя. В формате: "Authorization:
+          Token {your token}"'
+        required: true
+      tags:
+      - friends
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          description: return massive with objects containing users and their ID's
+  /friends/{username}/remove/:
+    delete:
+      operationId: friends_remove_destroy
+      description: Удаляет друга по переданному username.
+      parameters:
+      - in: header
+        name: Authorization
+        schema:
+          type: string
+        description: 'Требуется для определения пользователя. В формате: "Authorization:
+          Token {your token}"'
+        required: true
+      - in: path
+        name: username
+        schema:
+          type: string
+        description: Определяет какой пользователь будет удален из друзей.
+        required: true
+      tags:
+      - friends
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+        '404':
+          description: Возвращается если друг не найден
+  /friends/request/{username}/:
+    post:
+      operationId: friends_request_create
+      description: Отправляет запрос в друзья переданному username. Если от него уже
+        есть запрос - заявка в друзья будет принята автоматически
+      parameters:
+      - in: header
+        name: Authorization
+        schema:
+          type: string
+        description: 'Требуется для определения пользователя. В формате: "Authorization:
+          Token {your token}"'
+        required: true
+      - in: path
+        name: username
+        schema:
+          type: string
+        description: Определяет, статус какого пользователя будет возврщен.
+        required: true
+      tags:
+      - friends
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          description: Возвращается если запрос был отправлен\автоматически принят
+        '200':
+          description: Возвращается если с запросом возникли проблемыю
+        '404':
+          description: Пользователь с таким username не найден
+  /friends/request/{username}/status:
+    get:
+      operationId: friends_request_status_retrieve
+      description: Позволяет получить статус между авторизованным пользователем и
+        переданным username
+      parameters:
+      - in: header
+        name: Authorization
+        schema:
+          type: string
+        description: 'Требуется для определения пользователя. В формате: "Authorization:
+          Token {your token}"'
+        required: true
+      - in: path
+        name: username
+        schema:
+          type: string
+        description: Определяет, статус какого пользователя будет возврщен.
+        required: true
+      tags:
+      - friends
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          description: 'Возвращает одну из констант: nothing, incoming, outcoming,
+            friend'
+        '404':
+          description: Пользователь с таким username не найден
+  /friends/request/answer/{request_id}/:
+    post:
+      operationId: friends_request_answer_create
+      description: Позволяет отклонить или принять запрос в друзья, указав его номер
+        в пути
+      parameters:
+      - in: header
+        name: Authorization
+        schema:
+          type: string
+        description: 'Требуется для определения пользователя. В формате: "Authorization:
+          Token {your token}"'
+        required: true
+      - in: query
+        name: action
+        schema:
+          type: string
+        description: Если accept - то принять заявку, если cancel - то отклонить.
+          По-умолчанию - accept
+      - in: path
+        name: request_id
+        schema:
+          type: string
+        description: id запроса, на который будет прислан ответ
+        required: true
+      tags:
+      - friends
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          description: Возвращает OK если ответ успешно сохранен
+        '404':
+          description: Возвращает not found если запрос с таким id не найден
+  /friends/requests/:
+    get:
+      operationId: friends_requests_retrieve
+      description: Позволяет получить все запросы (входящие или исходящие)
+      parameters:
+      - in: header
+        name: Authorization
+        schema:
+          type: string
+        description: 'Требуется для определения пользователя. В формате: "Authorization:
+          Token {your token}"'
+        required: true
+      - in: query
+        name: incoming
+        schema:
+          type: string
+        description: Определяет, какие запросы будут выведены. Если true - то входящие,
+          или исходящие
+      tags:
+      - friends
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          description: возвращает массив объектов запросов пользователя с полями id,
+            username, is_accepted
+  /registration/:
+    post:
+      operationId: registration_create
+      description: Регистрирует пользователя с переданным username и паролем.
+      tags:
+      - registration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /token/:
+    post:
+      operationId: token_create
+      tags:
+      - token
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+          description: ''
+components:
+  schemas:
+    AuthToken:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        token:
+          type: string
+          readOnly: true
+      required:
+      - password
+      - token
+      - username
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        password:
+          type: string
+          writeOnly: true
+          maxLength: 128
+      required:
+      - date_joined
+      - id
+      - password
+      - username
+  securitySchemes:
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"
